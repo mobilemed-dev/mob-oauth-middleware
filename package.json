@@ -1,0 +1,23 @@
+{
+  "name": "mob-oauth-middleware",
+  "version": "1.0.0",
+  "description": "Express OAuth Middleware",
+  "main": "index.js",
+  "keywords": ["http", "oauth", "middleware", "express", "node"],
+  "author": "MobileMed",
+  "license": "MIT",
+  "repository": "mobilemed-dev/mob-oauth-middleware",
+  "homepage": "https://mobilemed.com.br/",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "index.js"
+  ],
+  "dependencies": {
+    "axios": "^0.27.2",
+    "mob-http-response": "^1.0.0"
+  }
+}
