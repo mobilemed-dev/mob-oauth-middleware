@@ -1,6 +1,5 @@
-const axios = require('axios');
-const qs = require('qs');
 const HttpResponse = require('mob-http-response');
+const {default: TokenValidator} = require('mob-oauth2-jwt-validator');
 
 module.exports = class OAuthMiddleware {
     constructor({ serverUrl, realm, clientId, clientSecret }) {
@@ -23,13 +22,15 @@ module.exports = class OAuthMiddleware {
             if (response.status === 200) {
                 const isActive =
                     response.data &&
-                    response.data.active === true;
+                    response.data['cognito:groups'] &&
+                    Array.isArray(response.data['cognito:groups']) &&
+                    response.data['cognito:groups'].length > 0;
 
                 if (!isActive) {
                     return HttpResponse.unauthorizedError(res);
                 }
 
-                const hasRole = args[0].some(a => response.data.resource_access[this.oauthConfig.clientId].roles.includes(a));
+                const hasRole = args[0].some(a => response.data['cognito:groups'].includes(a));
 
                 if (hasRole) {
                     next();
@@ -44,17 +45,25 @@ module.exports = class OAuthMiddleware {
 
     async _introspectToken(token) {
         try {
-            const url = `${this.oauthConfig.serverUrl}/realms/${this.oauthConfig.realm}/protocol/openid-connect/token/introspect`;
-            const headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
+            await TokenValidator.loadConfiguration({ oAuth2Issuer: this.oauthConfig.serverUrl })
+
+            const isValid = TokenValidator.validate(token);
+
+            if(!isValid) {
+                return {
+                    status: 401,
+                    data: {
+                        message: 'Invalid token'
+                    }
+                }
             }
-            const data = {
-                token: token,
-                client_id: this.oauthConfig.clientId,
-                client_secret: this.oauthConfig.clientSecret
-            }
-            const response = await axios.post(url, qs.stringify(data), { headers })
-            return response;
+
+            const data = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+            
+            return {
+                status: 200,
+                data
+            };
         } catch (error) {
             if (error.response) {
                 return error.response;

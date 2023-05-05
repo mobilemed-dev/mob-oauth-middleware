@@ -3,7 +3,13 @@
   "version": "1.1.1",
   "description": "Express OAuth Middleware",
   "main": "index.js",
-  "keywords": ["http", "oauth", "middleware", "express", "node"],
+  "keywords": [
+    "http",
+    "oauth",
+    "middleware",
+    "express",
+    "node"
+  ],
   "author": "MobileMed",
   "license": "MIT",
   "repository": "mobilemed-dev/mob-oauth-middleware",
@@ -20,6 +26,8 @@
   ],
   "dependencies": {
     "axios": "^0.27.2",
-    "mob-http-response": "^1.0.0"
+    "mob-http-response": "^1.0.0",
+    "mob-oauth2-jwt-validator": "^1.0.6",
+    "qs": "^6.11.1"
   }
 }
